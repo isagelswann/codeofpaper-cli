@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "codeofpaper"
+version = "0.1.0"
+description = "CLI for Code of Paper — discover GitHub implementations of research papers"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Code of Paper" },
+]
+keywords = ["arxiv", "papers", "research", "github", "code", "cli", "machine-learning"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "typer>=0.12,<1.0",
+    "httpx>=0.27,<1.0",
+    "rich>=13.0,<15.0",
+    "hishel>=0.0.31,<1.0",
+    "platformdirs>=4.0,<5.0",
+]
+
+[project.urls]
+Homepage = "https://codeofpaper.com"
+Repository = "https://github.com/codeofpaper/codeofpaper-cli"
+Documentation = "https://codeofpaper.com"
+
+[project.scripts]
+codeofpaper = "codeofpaper_cli.main:app"
+cop = "codeofpaper_cli.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["codeofpaper_cli"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
