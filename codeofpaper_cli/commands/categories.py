@@ -24,7 +24,7 @@ def categories(
     """List all categories or get details for one."""
     fmt = state.output.value
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             if category_id:
                 data = client.get_category(category_id)
             else:

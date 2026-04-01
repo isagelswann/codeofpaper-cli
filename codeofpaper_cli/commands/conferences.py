@@ -19,7 +19,7 @@ def conferences() -> None:
     """List all conference series with stats."""
     fmt = state.output.value
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             data = client.get_conferences()
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)

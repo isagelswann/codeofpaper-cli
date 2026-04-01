@@ -1,6 +1,7 @@
 """Tests for the HTTP client."""
 
 import json
+import ssl
 
 import httpx
 import pytest
@@ -302,3 +303,36 @@ class TestConvenienceMethods:
         client.get_health()
         assert calls[0]["path"] == "/health"
         client.close()
+
+
+class TestCABundle:
+    """Tests for custom CA bundle (TLS certificate) support."""
+
+    def test_default_verify_is_true(self):
+        """Without ca_bundle, httpx.Client should use default verification."""
+        client = Client(use_cache=False)
+        # httpx stores verify as an ssl.SSLContext; default is truthy
+        assert client._client._transport._pool._ssl_context is not None
+        client.close()
+
+    def test_ca_bundle_creates_ssl_context(self, tmp_path):
+        """When ca_bundle is set, Client should build an ssl.SSLContext from it."""
+        # Use a real (self-signed) cert generated in-memory via Python stdlib
+        import certifi
+
+        # Use certifi's real CA bundle as a valid PEM file for testing
+        ca_file = certifi.where()
+        client = Client(ca_bundle=ca_file, use_cache=False)
+        ctx = client._client._transport._pool._ssl_context
+        assert isinstance(ctx, ssl.SSLContext)
+        client.close()
+
+    def test_ca_bundle_none_uses_default(self):
+        """Explicitly passing None should behave like no ca_bundle."""
+        client = Client(ca_bundle=None, use_cache=False)
+        client.close()
+
+    def test_ca_bundle_invalid_path_raises(self):
+        """A non-existent CA bundle path should raise an error at Client creation."""
+        with pytest.raises(OSError):
+            Client(ca_bundle="/nonexistent/path/ca.pem", use_cache=False)

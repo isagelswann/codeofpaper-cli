@@ -26,6 +26,7 @@ class TestLoadConfig:
         assert cfg["api_url"] == "https://api.codeofpaper.com"
         assert cfg["api_key"] is None
         assert cfg["default_format"] == "table"
+        assert cfg["ca_bundle"] is None
 
     def test_loads_stored_values(self, tmp_path: Path):
         fake_file = tmp_path / "config.json"
@@ -35,6 +36,13 @@ class TestLoadConfig:
         assert cfg["api_key"] == "sk-abc123"
         assert cfg["default_format"] == "json"
         assert cfg["api_url"] == "https://api.codeofpaper.com"  # default filled
+
+    def test_loads_ca_bundle_from_config(self, tmp_path: Path):
+        fake_file = tmp_path / "config.json"
+        fake_file.write_text(json.dumps({"ca_bundle": "/etc/ssl/corporate-ca.pem"}))
+        with patch.object(config, "_CONFIG_FILE", fake_file):
+            cfg = config.load_config()
+        assert cfg["ca_bundle"] == "/etc/ssl/corporate-ca.pem"
 
     def test_handles_corrupt_json(self, tmp_path: Path):
         fake_file = tmp_path / "config.json"

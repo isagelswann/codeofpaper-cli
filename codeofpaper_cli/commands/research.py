@@ -46,7 +46,7 @@ def research(
         raise typer.Exit(code=1)
 
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             result = _run_research(client, query, depth, limit)
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)

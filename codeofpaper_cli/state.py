@@ -23,6 +23,8 @@ class State:
     output: OutputFormat = OutputFormat.table
     api_url: str = "https://api.codeofpaper.com"
     api_key: Optional[str] = None
+    ca_bundle: Optional[str] = None
+    timeout: Optional[float] = None
 
 
 state = State()

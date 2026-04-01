@@ -28,7 +28,7 @@ def conference(
     """Browse papers from a specific conference."""
     fmt = state.output.value
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             data = client.get_conference_papers(
                 conference_id,
                 has_code=True if has_code else None,

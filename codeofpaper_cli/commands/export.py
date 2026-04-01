@@ -27,6 +27,7 @@ from codeofpaper_cli.formatters import (
 from codeofpaper_cli.state import state
 
 _PAGE_SIZE = 100
+_MAX_EXPORT = 5000  # hard cap on export results
 _DELAY = 0.5  # seconds between paginated requests
 
 # CSV columns for papers
@@ -151,12 +152,12 @@ def export(
     has_code: bool = typer.Option(False, "--has-code", help="Only include papers with code."),
     category: Optional[str] = typer.Option(None, "--category", "-c", help="Filter by arXiv category."),
     days: int = typer.Option(30, "--days", "-d", help="Time window for trending (days)."),
-    max_results: int = typer.Option(200, "--max", help="Maximum total papers to export."),
+    max_results: int = typer.Option(200, "--max", max=_MAX_EXPORT, help=f"Maximum total papers to export (max {_MAX_EXPORT})."),
 ) -> None:
     """Bulk export papers from trending, a conference, or a search query."""
     fmt = state.output.value
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             papers = _fetch_pages(
                 client,
                 source=source.lower(),

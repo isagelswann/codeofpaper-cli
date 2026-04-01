@@ -29,7 +29,7 @@ def trending(
     """Browse trending papers."""
     fmt = state.output.value
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             data = client.get_trending(
                 sort=sort, has_code=has_code, limit=limit,
                 offset=offset, category=category, days=days,

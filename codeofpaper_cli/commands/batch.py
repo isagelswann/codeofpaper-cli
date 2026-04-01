@@ -70,7 +70,7 @@ def _emit(record: dict[str, Any]) -> None:
 def batch(
     command: str = typer.Argument(..., help="Command to batch: paper, search, code, similar, suggest."),
     file: Optional[str] = typer.Argument(None, help="File with one query/ID per line (default: stdin)."),
-    delay: float = typer.Option(0.5, "--delay", help="Delay between API calls in seconds."),
+    delay: float = typer.Option(0.5, "--delay", min=0.1, help="Delay between API calls in seconds (min 0.1)."),
 ) -> None:
     """Process multiple queries/IDs from stdin or a file.
 
@@ -95,7 +95,7 @@ def batch(
     ok = 0
     errors = 0
 
-    with Client(base_url=state.api_url, api_key=state.api_key) as client:
+    with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
         for i, input_line in enumerate(inputs):
             try:
                 data = _call(client, method_name, input_line)

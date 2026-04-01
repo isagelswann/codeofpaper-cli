@@ -28,6 +28,7 @@ DEFAULTS: dict[str, Any] = {
     "api_url": "https://api.codeofpaper.com",
     "api_key": None,
     "default_format": "table",
+    "ca_bundle": None,
 }
 
 

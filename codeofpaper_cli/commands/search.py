@@ -30,7 +30,7 @@ def search(
     """Search papers by text query."""
     fmt = state.output.value
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             data = client.search_papers(query=query, limit=limit, offset=offset, sort_by=sort)
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)

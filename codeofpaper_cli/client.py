@@ -9,6 +9,7 @@ Wraps httpx with:
 
 from __future__ import annotations
 
+import ssl
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -25,7 +26,7 @@ from codeofpaper_cli.exit_codes import CONNECTION_ERROR, GENERAL_ERROR, exit_cod
 _CACHE_DIR = Path(platformdirs.user_cache_dir("codeofpaper")) / "http"
 
 USER_AGENT = f"codeofpaper-cli/{__version__}"
-DEFAULT_TIMEOUT = 10.0
+DEFAULT_TIMEOUT = 30.0
 DEFAULT_MAX_RETRIES = 1
 CACHE_TTL = 1800  # 30 minutes
 
@@ -86,12 +87,14 @@ class Client:
         self,
         base_url: str = "https://api.codeofpaper.com",
         api_key: str | None = None,
-        timeout: float = DEFAULT_TIMEOUT,
+        timeout: float | None = None,
         max_retries: int = DEFAULT_MAX_RETRIES,
         use_cache: bool = True,
+        ca_bundle: str | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
+        effective_timeout = timeout if timeout is not None else DEFAULT_TIMEOUT
 
         headers = {
             "User-Agent": USER_AGENT,
@@ -100,15 +103,22 @@ class Client:
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
 
-        base_transport = httpx.HTTPTransport(retries=max_retries)
+        # TLS verification: custom CA bundle path, or default (True = certifi).
+        if ca_bundle:
+            verify: ssl.SSLContext | bool = ssl.create_default_context(cafile=ca_bundle)
+        else:
+            verify = True
+
+        base_transport = httpx.HTTPTransport(retries=max_retries, verify=verify)
 
         transport = _build_cache_transport(base_transport) if use_cache else base_transport
 
         self._client = httpx.Client(
             base_url=self.base_url,
             headers=headers,
-            timeout=timeout,
+            timeout=effective_timeout,
             transport=transport,
+            verify=verify,
         )
 
     def close(self) -> None:

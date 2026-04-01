@@ -31,6 +31,7 @@ def _reset_state():
     state.output = OutputFormat.table
     state.api_url = "https://api.codeofpaper.com"
     state.api_key = None
+    state.ca_bundle = None
     yield
 
 
@@ -210,8 +211,8 @@ SAMPLE_SIMILAR_RESPONSE = {
     ],
 }
 
-SAMPLE_HEALTH = {"api_status": "ok", "database": "connected", "redis": "connected"}
-SAMPLE_PAPER_HEALTH = {"total_papers": 181000, "papers_with_repos": 93000}
+SAMPLE_HEALTH = {"status": "ok", "services": {"database": "connected", "redis": "connected"}}
+SAMPLE_PAPER_HEALTH = {"paper_count": 181000, "papers_with_repos": 93000}
 
 SAMPLE_SUGGEST = [
     {"id": "2010.11929", "arxiv_id": "2010.11929", "title": "An Image is Worth 16x16 Words", "has_repos": True},
@@ -804,8 +805,8 @@ class TestStatus:
         result = runner.invoke(app, ["-o", "json", "status"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["api_status"] == "ok"
-        assert data["total_papers"] == 181000
+        assert data["status"] == "ok"
+        assert data["paper_count"] == 181000
 
     @patch("codeofpaper_cli.commands.status.Client")
     def test_quiet(self, MockClient):

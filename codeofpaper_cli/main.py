@@ -91,6 +91,18 @@ def main(
         help="Override API key (default: from config file).",
         envvar="CODEOFPAPER_API_KEY",
     ),
+    ca_bundle: Optional[str] = typer.Option(
+        None,
+        "--ca-bundle",
+        help="Path to a CA certificate bundle (PEM) for TLS verification.",
+        envvar="CODEOFPAPER_CA_BUNDLE",
+    ),
+    timeout: Optional[float] = typer.Option(
+        None,
+        "--timeout",
+        help="Request timeout in seconds (default: 30).",
+        envvar="CODEOFPAPER_TIMEOUT",
+    ),
     version: bool = typer.Option(
         False,
         "-v",
@@ -126,6 +138,16 @@ def main(
 
     # API key: --api-key flag > env var > config > None
     state.api_key = api_key if api_key is not None else cfg.get("api_key")
+
+    # CA bundle: --ca-bundle flag > env var > config > None (system default)
+    state.ca_bundle = ca_bundle if ca_bundle is not None else cfg.get("ca_bundle")
+
+    # Timeout: --timeout flag > env var > config > None (use client default)
+    if timeout is not None:
+        state.timeout = timeout
+    else:
+        cfg_timeout = cfg.get("timeout")
+        state.timeout = float(cfg_timeout) if cfg_timeout is not None else None
 
 
 # Register all commands

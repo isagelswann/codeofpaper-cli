@@ -307,7 +307,8 @@ Fields:
 {
   "api_url": "https://api.codeofpaper.com",
   "api_key": null,
-  "default_format": "table"
+  "default_format": "table",
+  "ca_bundle": null
 }
 ```
 
@@ -317,10 +318,36 @@ No config file needed — everything works out of the box with sensible defaults
 
 Options are resolved in this order (first wins):
 
-1. CLI flag (`--api-url`, `--api-key`, `-o`)
-2. Environment variable (`CODEOFPAPER_API_URL`, `CODEOFPAPER_API_KEY`, `CODEOFPAPER_OUTPUT`)
+1. CLI flag (`--api-url`, `--api-key`, `--ca-bundle`, `-o`)
+2. Environment variable (`CODEOFPAPER_API_URL`, `CODEOFPAPER_API_KEY`, `CODEOFPAPER_CA_BUNDLE`, `CODEOFPAPER_OUTPUT`)
 3. Config file
 4. Built-in defaults
+
+### Corporate Proxies / Custom TLS Certificates
+
+If you're behind a corporate proxy that performs TLS inspection (man-in-the-middle), you'll see an SSL error like:
+
+```
+Cannot reach API: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain
+```
+
+To fix this, point the CLI at your corporate CA certificate bundle (PEM file). Three equivalent ways, in priority order:
+
+```bash
+# 1. CLI flag (per-invocation)
+codeofpaper --ca-bundle /path/to/corporate-ca.pem search "transformers"
+
+# 2. Environment variable (per-session or in .bashrc/.zshrc)
+export CODEOFPAPER_CA_BUNDLE=/path/to/corporate-ca.pem
+
+# 3. Config file (permanent — set once, forget)
+# Add to ~/.config/codeofpaper/config.json:
+#   {"ca_bundle": "/path/to/corporate-ca.pem"}
+```
+
+Ask your IT department for the CA certificate file if you don't have it.
+
+> **Tip:** If you've already set `SSL_CERT_FILE` for other tools (pip, curl, etc.), httpx respects that variable automatically — no extra configuration needed.
 
 ## Alias: `cop`
 
@@ -355,7 +382,6 @@ codeofpaper -v              # Print version
 
 - **Website:** https://codeofpaper.com
 - **API docs:** https://api.codeofpaper.com/docs
-- **Repository:** https://github.com/codeofpaper/codeofpaper-cli
 - **Agent discovery:** https://codeofpaper.com/llms.txt
 
 ## License

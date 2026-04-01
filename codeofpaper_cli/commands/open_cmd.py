@@ -20,7 +20,7 @@ def open_paper(
     if code:
         # Fetch repos and open the top one
         try:
-            with Client(base_url=state.api_url, api_key=state.api_key) as client:
+            with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
                 data = client.get_paper_repos(arxiv_id, limit=1)
         except (APIError, ConnectionError_) as exc:
             print_error(str(exc), fmt)

@@ -24,7 +24,7 @@ def repo(
     fmt = state.output.value
     owner_repo = extract_github_repo(repo_name)
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             data = client.search_papers(query=owner_repo, limit=10)
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)

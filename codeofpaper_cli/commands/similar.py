@@ -25,7 +25,7 @@ def similar(
     fmt = state.output.value
     arxiv_id = extract_arxiv_id(paper_id)
     try:
-        with Client(base_url=state.api_url, api_key=state.api_key) as client:
+        with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
             data = client.get_similar(arxiv_id, limit=limit)
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
