@@ -26,12 +26,47 @@ def search(
         "relevant", "--sort", "-s", help="Sort by: relevant, recent, has_code, trending."
     ),
     has_code: bool = typer.Option(False, "--has-code", help="Only show papers with code."),
+    year: Optional[int] = typer.Option(
+        None, "--year", help="Restrict to a single publication year."
+    ),
+    after: Optional[str] = typer.Option(
+        None, "--after", help="Only papers published on/after YYYY-MM-DD (or YYYY)."
+    ),
+    before: Optional[str] = typer.Option(
+        None, "--before", help="Only papers published on/before YYYY-MM-DD (or YYYY)."
+    ),
+    venue: Optional[str] = typer.Option(
+        None,
+        "--venue",
+        help="Conference series ('neurips'), id ('neurips2024'), or name substring.",
+    ),
 ) -> None:
     """Search papers by text query."""
     fmt = state.output.value
+
+    def _norm_date(value: Optional[str], end_of_year: bool) -> Optional[str]:
+        if not value:
+            return None
+        v = value.strip()
+        if len(v) == 4 and v.isdigit():
+            return f"{v}-12-31" if end_of_year else f"{v}-01-01"
+        return v
+
+    after_param = _norm_date(after, end_of_year=False)
+    before_param = _norm_date(before, end_of_year=True)
+
     try:
         with Client(base_url=state.api_url, api_key=state.api_key, ca_bundle=state.ca_bundle, timeout=state.timeout) as client:
-            data = client.search_papers(query=query, limit=limit, offset=offset, sort_by=sort)
+            data = client.search_papers(
+                query=query,
+                limit=limit,
+                offset=offset,
+                sort_by=sort,
+                year=year,
+                after=after_param,
+                before=before_param,
+                venue=venue,
+            )
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
         raise typer.Exit(code=exc.exit_code)

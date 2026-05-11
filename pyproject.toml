@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "codeofpaper"
-version = "0.1.2"
+version = "0.1.3"
 description = "CLI for Code of Paper — discover GitHub implementations of research papers"
 readme = "README.md"
 license = "MIT"

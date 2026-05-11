@@ -27,6 +27,10 @@ _CACHE_DIR = Path(platformdirs.user_cache_dir("codeofpaper")) / "http"
 
 USER_AGENT = f"codeofpaper-cli/{__version__}"
 DEFAULT_TIMEOUT = 30.0
+# Cap the TCP connect phase tightly so corporate networks that silently
+# black-hole packets (no RST, no ICMP) fail fast instead of hanging until
+# the global timeout fires. Read/write/pool keep the larger budget.
+DEFAULT_CONNECT_TIMEOUT = 10.0
 DEFAULT_MAX_RETRIES = 1
 CACHE_TTL = 1800  # 30 minutes
 
@@ -95,6 +99,14 @@ class Client:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         effective_timeout = timeout if timeout is not None else DEFAULT_TIMEOUT
+        # Build a per-phase Timeout: connect is short, other phases use the
+        # user-provided budget. This guarantees `--timeout` can never be
+        # exceeded by more than a few seconds on a hung TCP handshake.
+        connect_cap = min(DEFAULT_CONNECT_TIMEOUT, effective_timeout)
+        self._timeout = httpx.Timeout(
+            effective_timeout,
+            connect=connect_cap,
+        )
 
         headers = {
             "User-Agent": USER_AGENT,
@@ -116,7 +128,7 @@ class Client:
         self._client = httpx.Client(
             base_url=self.base_url,
             headers=headers,
-            timeout=effective_timeout,
+            timeout=self._timeout,
             transport=transport,
             verify=verify,
         )
@@ -139,7 +151,22 @@ class Client:
         """
         try:
             response = self._client.get(path, params=_clean_params(params))
-        except (httpx.ConnectError, httpx.TimeoutException, httpx.NetworkError) as exc:
+        except (httpx.ConnectTimeout, httpx.ConnectError) as exc:
+            raise ConnectionError_(
+                detail=(
+                    f"Cannot reach API at {self.base_url} "
+                    f"(connect failed: {exc}). "
+                    "Check your network/proxy or pass --api-url to override."
+                )
+            )
+        except (httpx.ReadTimeout, httpx.WriteTimeout, httpx.PoolTimeout) as exc:
+            raise ConnectionError_(
+                detail=(
+                    f"Request to {self.base_url}{path} timed out after "
+                    f"{self._timeout}. Increase --timeout or retry."
+                )
+            )
+        except (httpx.TimeoutException, httpx.NetworkError) as exc:
             raise ConnectionError_(detail=f"Cannot reach API at {self.base_url}: {exc}")
         except httpx.HTTPError as exc:
             raise ConnectionError_(detail=f"HTTP error: {exc}")
@@ -164,11 +191,28 @@ class Client:
     # --- Convenience methods for specific endpoints ---
 
     def search_papers(
-        self, query: str, limit: int = 10, offset: int = 0, sort_by: str = "relevant"
+        self,
+        query: str,
+        limit: int = 10,
+        offset: int = 0,
+        sort_by: str = "relevant",
+        year: int | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        venue: str | None = None,
     ) -> dict[str, Any]:
         return self.get(
             "/papers/search",
-            params={"query": query, "limit": limit, "offset": offset, "sort_by": sort_by},
+            params={
+                "query": query,
+                "limit": limit,
+                "offset": offset,
+                "sort_by": sort_by,
+                "year": year,
+                "after": after,
+                "before": before,
+                "venue": venue,
+            },
         )
 
     def get_paper(self, paper_id: str) -> dict[str, Any]:

@@ -58,6 +58,7 @@ class TestClient:
         client = Client.__new__(Client)
         client.base_url = kwargs.get("base_url", "https://api.codeofpaper.com")
         client.api_key = kwargs.get("api_key", None)
+        client._timeout = httpx.Timeout(30.0, connect=10.0)
         client._client = httpx.Client(
             base_url=client.base_url,
             transport=transport,
@@ -206,6 +207,33 @@ class TestConvenienceMethods:
         assert calls[0]["params"]["query"] == "transformers"
         assert calls[0]["params"]["sort_by"] == "recent"
         assert calls[0]["params"]["limit"] == "5"
+        client.close()
+
+    def test_search_papers_with_filters(self):
+        client, calls = self._tracking_client()
+        client.search_papers(
+            "transformers",
+            year=2024,
+            after="2024-01-01",
+            before="2024-12-31",
+            venue="neurips",
+        )
+        params = calls[0]["params"]
+        assert params["year"] == "2024"
+        assert params["after"] == "2024-01-01"
+        assert params["before"] == "2024-12-31"
+        assert params["venue"] == "neurips"
+        client.close()
+
+    def test_search_papers_filters_default_none_stripped(self):
+        client, calls = self._tracking_client()
+        client.search_papers("transformers")
+        params = calls[0]["params"]
+        # None values should be stripped by _clean_params
+        assert "year" not in params
+        assert "after" not in params
+        assert "before" not in params
+        assert "venue" not in params
         client.close()
 
     def test_get_paper(self):

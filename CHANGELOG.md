@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.3 — 2026-05-11
+
+### Added
+
+- `search` command: `--year`, `--after`, `--before`, `--venue` filters matching the API. `--after` / `--before` accept `YYYY` (expanded to Jan 1 / Dec 31) or `YYYY-MM-DD`.
+- Per-phase HTTP timeouts: connect phase capped at 10s (or `--timeout`, whichever is lower) so corporate networks that black-hole packets fail fast instead of hanging until the global timeout.
+
+### Fixed
+
+- More precise error messages for connect-vs-read timeouts; connect failures now suggest checking network/proxy or passing `--api-url`.
+
 ## 0.1.2 — 2026-04-01
 
 ### Added
