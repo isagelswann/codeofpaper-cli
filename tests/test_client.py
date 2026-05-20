@@ -247,6 +247,23 @@ class TestConvenienceMethods:
         client.get_paper_repos("2010.11929", limit=5)
         assert calls[0]["path"] == "/papers/2010.11929/repos"
         assert calls[0]["params"]["limit"] == "5"
+        # Default: don't send include_possible so server applies its default.
+        assert "include_possible" not in calls[0]["params"]
+        client.close()
+
+    def test_get_paper_repos_confident_only(self):
+        client, calls = self._tracking_client()
+        client.get_paper_repos("2010.11929", limit=5, include_possible=False)
+        assert calls[0]["path"] == "/papers/2010.11929/repos"
+        assert calls[0]["params"]["include_possible"] == "false"
+        client.close()
+
+    def test_get_paper_fork_graph(self):
+        client, calls = self._tracking_client()
+        client.get_paper_fork_graph("2010.11929", parent_limit=2, forks_per_parent=4)
+        assert calls[0]["path"] == "/papers/2010.11929/fork-graph"
+        assert calls[0]["params"]["parent_limit"] == "2"
+        assert calls[0]["params"]["forks_per_parent"] == "4"
         client.close()
 
     def test_get_similar(self):

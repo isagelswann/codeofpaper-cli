@@ -218,8 +218,32 @@ class Client:
     def get_paper(self, paper_id: str) -> dict[str, Any]:
         return self.get(f"/papers/{paper_id}")
 
-    def get_paper_repos(self, paper_id: str, limit: int = 10) -> dict[str, Any]:
-        return self.get(f"/papers/{paper_id}/repos", params={"limit": limit})
+    def get_paper_repos(
+        self,
+        paper_id: str,
+        limit: int = 10,
+        include_possible: bool | None = None,
+    ) -> dict[str, Any]:
+        params: dict[str, Any] = {"limit": limit}
+        if include_possible is not None:
+            # API default is True; only send when caller opts out so we keep
+            # parity with the server's documented default.
+            params["include_possible"] = include_possible
+        return self.get(f"/papers/{paper_id}/repos", params=params)
+
+    def get_paper_fork_graph(
+        self,
+        paper_id: str,
+        parent_limit: int = 3,
+        forks_per_parent: int = 5,
+    ) -> dict[str, Any]:
+        return self.get(
+            f"/papers/{paper_id}/fork-graph",
+            params={
+                "parent_limit": parent_limit,
+                "forks_per_parent": forks_per_parent,
+            },
+        )
 
     def get_similar(self, paper_id: str, limit: int = 6) -> dict[str, Any]:
         return self.get(f"/papers/{paper_id}/similar", params={"limit": limit})

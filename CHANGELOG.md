@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.0 — 2026-05-20
+
+Tier + fork-graph surfacing. Aligns the CLI with the backend's Phase 0c
+engineering metadata so agents that shell out get the full reproducibility
+context in one call.
+
+### Added
+
+- `paper -o json` / `-o jsonl`: now also fetches `/papers/{id}/repos` (confident matches only) and `/papers/{id}/fork-graph` and merges them into the JSON payload as `repos`, `no_confident_match`, and `fork_graph`. Best-effort — enrichment failures fall back silently to the bare paper payload.
+- `paper --with-repos / --no-repos` (default on) to skip the enrichment calls when you only need the bare paper record.
+- `code -o json` / `-o jsonl`: now also fetches `/papers/{id}/fork-graph` and merges it as `fork_graph`.
+- `code --with-fork-graph / --no-fork-graph` (default on) to skip the fork-graph call.
+- `code -o csv`: new columns `tier`, `framework`, `license_spdx` so spreadsheets / agents can filter on Phase 0c confidence tier and engineering metadata.
+- `code` default table: new `Tier` column (official / hcc / possible) replaces the `Official` column.
+- Client: new `get_paper_fork_graph(paper_id, parent_limit=3, forks_per_parent=5)` method on `Client`.
+- Client: `get_paper_repos` gains an optional `include_possible: bool | None = None` parameter (only sent on the wire when explicitly set, so server-side default behaviour is preserved).
+
+### Changed
+
+- `code` default table column set: `Repository | Tier | Stars | Forks | Score`. Framework / license remain available in `-o json` and `-o csv`.
+
 ## 0.1.3 — 2026-05-11
 
 ### Added

@@ -41,6 +41,10 @@ codeofpaper trending --has-code
 # JSON output for scripts and agents
 codeofpaper -o json trending | jq '.trending[] | {title, stars: .max_stars}'
 
+# One-shot reproducibility context for an agent: paper + confident repos
+# (with tier + framework + license) + fork-graph in a single JSON payload.
+codeofpaper -o json paper 2010.11929 | jq '{title, repos: [.repos[] | {full_name, tier}], forks: [.fork_graph[] | .full_name]}'
+
 # Literature review in one command
 codeofpaper research "reinforcement learning" --depth deep
 ```

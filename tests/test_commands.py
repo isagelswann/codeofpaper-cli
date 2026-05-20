@@ -6,6 +6,7 @@ Tests cover all 14 commands x 3 key output formats (table, json, quiet).
 
 from __future__ import annotations
 
+import copy
 import json
 from unittest.mock import MagicMock, patch
 
@@ -435,6 +436,111 @@ class TestCode:
         assert result.exit_code == 0
         assert "full_name" in result.output
         assert "google-research/vision_transformer" in result.output
+
+    # ---- v0.2.0: tier + fork-graph + engineering fields --------------------
+
+    @patch("codeofpaper_cli.commands.code.Client")
+    def test_csv_has_v020_columns(self, MockClient):
+        """v0.2.0 CSV exposes tier/framework/license_spdx (Phase 0c)."""
+        MockClient.return_value = _mock_client(get_paper_repos=SAMPLE_REPOS_RESPONSE).return_value
+        result = runner.invoke(app, ["-o", "csv", "code", "2010.11929"])
+        assert result.exit_code == 0
+        header = result.output.splitlines()[0]
+        for col in ("tier", "framework", "license_spdx"):
+            assert col in header
+
+    @patch("codeofpaper_cli.commands.code.Client")
+    def test_table_shows_tier(self, MockClient):
+        """v0.2.0 default table includes a Tier column."""
+        repos_with_tier = {
+            **SAMPLE_REPOS_RESPONSE,
+            "top_repos": [
+                {**SAMPLE_REPOS_RESPONSE["top_repos"][0], "tier": "official"},
+                {**SAMPLE_REPOS_RESPONSE["top_repos"][1], "tier": "high_confidence_community"},
+            ],
+        }
+        MockClient.return_value = _mock_client(get_paper_repos=repos_with_tier).return_value
+        result = runner.invoke(app, ["code", "2010.11929"])
+        assert result.exit_code == 0
+        assert "Tier" in result.output
+        assert "official" in result.output
+        assert "hcc" in result.output
+
+    @patch("codeofpaper_cli.commands.code.Client")
+    def test_json_merges_fork_graph(self, MockClient):
+        """v0.2.0 `code -o json` merges fork-graph by default."""
+        fg = {"paper": {"arxiv_id": "2010.11929"}, "repos": [{"full_name": "x/y", "parent_full_name": "google-research/vision_transformer"}]}
+        MockClient.return_value = _mock_client(
+            get_paper_repos=copy.deepcopy(SAMPLE_REPOS_RESPONSE),
+            get_paper_fork_graph=fg,
+        ).return_value
+        result = runner.invoke(app, ["-o", "json", "code", "2010.11929"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["fork_graph"][0]["full_name"] == "x/y"
+
+    @patch("codeofpaper_cli.commands.code.Client")
+    def test_json_no_fork_graph_flag(self, MockClient):
+        """`--no-fork-graph` skips the fork-graph call entirely."""
+        MockClient.return_value = _mock_client(
+            get_paper_repos=copy.deepcopy(SAMPLE_REPOS_RESPONSE)
+        ).return_value
+        result = runner.invoke(app, ["-o", "json", "code", "2010.11929", "--no-fork-graph"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "fork_graph" not in data
+        MockClient.return_value.get_paper_fork_graph.assert_not_called()
+
+
+class TestPaperEnrichment:
+    """v0.2.0: `paper -o json` merges confident repos + fork-graph."""
+
+    @patch("codeofpaper_cli.commands.paper.Client")
+    def test_json_merges_repos_and_fork_graph(self, MockClient):
+        repos = {"top_repos": [{"full_name": "google-research/vision_transformer", "tier": "official"}]}
+        fg = {"repos": [{"full_name": "fork/x"}]}
+        MockClient.return_value = _mock_client(
+            get_paper=copy.deepcopy(SAMPLE_PAPER_DETAIL),
+            get_paper_repos=repos,
+            get_paper_fork_graph=fg,
+        ).return_value
+        result = runner.invoke(app, ["-o", "json", "paper", "2010.11929"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["repos"][0]["full_name"] == "google-research/vision_transformer"
+        assert data["fork_graph"][0]["full_name"] == "fork/x"
+
+    @patch("codeofpaper_cli.commands.paper.Client")
+    def test_json_no_confident_match_flag(self, MockClient):
+        """Server-flagged `no_confident_match` propagates into enriched JSON."""
+        repos = {
+            "paper": {"arxiv_id": "2010.11929", "no_confident_match": True},
+            "top_repos": [],
+        }
+        MockClient.return_value = _mock_client(
+            get_paper=copy.deepcopy(SAMPLE_PAPER_DETAIL),
+            get_paper_repos=repos,
+            get_paper_fork_graph={"repos": []},
+        ).return_value
+        result = runner.invoke(app, ["-o", "json", "paper", "2010.11929"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["no_confident_match"] is True
+        assert data["repos"] == []
+
+    @patch("codeofpaper_cli.commands.paper.Client")
+    def test_json_no_repos_flag(self, MockClient):
+        """`--no-repos` skips enrichment calls."""
+        MockClient.return_value = _mock_client(
+            get_paper=copy.deepcopy(SAMPLE_PAPER_DETAIL)
+        ).return_value
+        result = runner.invoke(app, ["-o", "json", "paper", "2010.11929", "--no-repos"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "repos" not in data
+        assert "fork_graph" not in data
+        MockClient.return_value.get_paper_repos.assert_not_called()
+        MockClient.return_value.get_paper_fork_graph.assert_not_called()
 
 
 # ---------------------------------------------------------------------------

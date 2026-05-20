@@ -292,21 +292,38 @@ def build_repo_table(repos: Sequence[dict], title: str | None = None) -> Table:
     table = Table(title=title, show_header=True, header_style="bold", pad_edge=False)
 
     table.add_column("Repository", min_width=25, max_width=40)
-    table.add_column("Stars", justify="right", width=8)
+    # Phase 0c tier (official / hcc / possible_match) replaces the old
+    # "Official" column. Framework + license / license_spdx are in `-o json`
+    # / `-o csv` to keep the default table within an 80-column terminal.
+    table.add_column("Tier", width=9)
+    table.add_column("Stars", justify="right", width=7)
     table.add_column("Forks", justify="right", width=7)
     table.add_column("Score", justify="right", width=6)
-    table.add_column("Official", justify="center", width=8)
 
     for r in repos:
         table.add_row(
             _truncate(r.get("full_name", ""), 37),
+            _tier_label(r.get("tier")),
             _format_stars(r.get("stars")),
             str(r.get("forks", "")),
             f"{r.get('score', 0):.2f}" if r.get("score") else "",
-            _official_indicator(r),
         )
 
     return table
+
+
+_TIER_LABELS = {
+    "official": "official",
+    "high_confidence_community": "hcc",
+    "possible_match": "possible",
+}
+
+
+def _tier_label(tier: str | None) -> str:
+    """Compact label for the tier column. Empty when unknown."""
+    if not tier:
+        return ""
+    return _TIER_LABELS.get(tier, str(tier))
 
 
 def build_category_table(areas: Sequence[dict]) -> Table:
