@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "codeofpaper"
-version = "0.2.0"
+version = "0.3.0"
 description = "CLI for Code of Paper — discover GitHub implementations of research papers"
 readme = "README.md"
 license = "MIT"
@@ -35,6 +35,12 @@ dependencies = [
     "platformdirs>=4.0,<5.0",
 ]
 
+[project.optional-dependencies]
+# Optional MCP (Model Context Protocol) server — exposes paper /
+# code-lookup as tools to Claude Desktop, Cursor, Continue, Cline, etc.
+#   pip install 'codeofpaper[mcp]'
+mcp = ["fastmcp>=2.0,<3.0"]
+
 [project.urls]
 Homepage = "https://codeofpaper.com"
 Documentation = "https://codeofpaper.com"
@@ -42,6 +48,7 @@ Documentation = "https://codeofpaper.com"
 [project.scripts]
 codeofpaper = "codeofpaper_cli.main:app"
 cop = "codeofpaper_cli.main:app"
+codeofpaper-mcp = "codeofpaper_cli.mcp.server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["codeofpaper_cli"]

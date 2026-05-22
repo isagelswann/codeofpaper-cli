@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0 — 2026-05-22
+
+Optional MCP (Model Context Protocol) server. Exposes paper / code lookup
+as tools to Claude Desktop, Cursor, Continue, Cline, Zed, and any other
+MCP-compatible agent. Read-only, no auth, distribution-only release —
+the existing CLI surface is unchanged.
+
+### Added
+
+- New optional extra `codeofpaper[mcp]` pulling in `fastmcp>=2.0,<3.0`.
+- New console script `codeofpaper-mcp` speaking MCP over stdio.
+- Three tools registered: `paper_lookup(paper_id_or_url)`, `code_for_paper(paper_id_or_url, limit, include_possible)`, `search_papers(query, limit, year, venue, has_code)`.
+- Per-call MCP traffic is tagged with a `codeofpaper-mcp/<version>` User-Agent so server-side telemetry can distinguish MCP from CLI installs.
+- API errors surface as `{"error": "...", "status": N}` dicts (never thrown) so MCP clients always get structured tool output.
+- `CODEOFPAPER_API_URL` env var honoured by the MCP server for self-hosted / dev backends.
+- README: new "MCP Server (optional)" section with Claude Desktop / Cursor / Continue config snippets.
+
 ## 0.2.0 — 2026-05-20
 
 Tier + fork-graph surfacing. Aligns the CLI with the backend's Phase 0c

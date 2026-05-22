@@ -218,6 +218,63 @@ done
 
 Responses are cached on disk for 30 minutes (`~/.cache/codeofpaper/http/`), so repeated calls are instant and free.
 
+## MCP Server (optional)
+
+Code of Paper ships an optional [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes paper / code lookup as tools to any MCP-compatible agent — Claude Desktop, Cursor, Continue, Cline, Zed, etc.
+
+Install with the `mcp` extra:
+
+```bash
+pip install 'codeofpaper[mcp]'
+# or, with uv:
+uv tool install 'codeofpaper[mcp]'
+```
+
+This adds a `codeofpaper-mcp` entry point that speaks MCP over stdio.
+
+### Wire into Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+```json
+{
+  "mcpServers": {
+    "codeofpaper": {
+      "command": "codeofpaper-mcp"
+    }
+  }
+}
+```
+
+If you installed via `uv tool install`, use `uvx codeofpaper-mcp` instead.
+
+### Wire into Cursor / Continue / Cline
+
+Most MCP clients accept the same shape:
+
+```json
+{
+  "mcpServers": {
+    "codeofpaper": {
+      "command": "codeofpaper-mcp",
+      "env": {
+        "CODEOFPAPER_API_URL": "https://api.codeofpaper.com"
+      }
+    }
+  }
+}
+```
+
+### Tools exposed
+
+| Tool | Purpose |
+|------|---------|
+| `paper_lookup(paper_id_or_url)` | Paper metadata + confident-tier repos |
+| `code_for_paper(paper_id_or_url, limit, include_possible)` | Ranked GitHub repos implementing a paper |
+| `search_papers(query, limit, year, venue, has_code)` | Free-text paper search with filters |
+
+All tools are read-only, return plain JSON, and surface API errors as `{"error": "...", "status": N}` rather than throwing — agents get structured output either way.
+
 ## Common Workflows
 
 ### Core Discovery
