@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2 — 2026-05-31
+
+MCP Registry submission prep. No CLI or MCP surface changes.
+
+### Added
+
+- `<!-- mcp-name: io.github.isagelswann/codeofpaper -->` marker in README — required for MCP Registry ownership verification on PyPI packages.
+
 ## 0.3.1 — 2026-05-31
 
 Repository hygiene + public-launch prep. No CLI or MCP surface changes.

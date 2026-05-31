@@ -8,6 +8,8 @@ Search 181k+ arXiv papers and find their code on GitHub. Works for humans and AI
 [![Python 3.10+](https://img.shields.io/pypi/pyversions/codeofpaper)](https://pypi.org/project/codeofpaper/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+<!-- mcp-name: io.github.isagelswann/codeofpaper -->
+
 ## Install
 
 ```bash
