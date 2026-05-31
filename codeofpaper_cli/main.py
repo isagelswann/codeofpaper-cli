@@ -13,13 +13,11 @@ Install shell completion:
 Full docs: https://codeofpaper.com
 """
 
-from enum import Enum
-from typing import Optional
 
 import typer
 
 from codeofpaper_cli import __version__
-from codeofpaper_cli.state import OutputFormat, State, state
+from codeofpaper_cli.state import OutputFormat, state
 from codeofpaper_cli.commands import (
     auth,
     batch,
@@ -85,19 +83,19 @@ def main(
         help="Override API base URL.",
         envvar="CODEOFPAPER_API_URL",
     ),
-    api_key: Optional[str] = typer.Option(
+    api_key: str | None = typer.Option(
         None,
         "--api-key",
         help="Override API key (default: from config file).",
         envvar="CODEOFPAPER_API_KEY",
     ),
-    ca_bundle: Optional[str] = typer.Option(
+    ca_bundle: str | None = typer.Option(
         None,
         "--ca-bundle",
         help="Path to a CA certificate bundle (PEM) for TLS verification.",
         envvar="CODEOFPAPER_CA_BUNDLE",
     ),
-    timeout: Optional[float] = typer.Option(
+    timeout: float | None = typer.Option(
         None,
         "--timeout",
         help="Request timeout in seconds (default: 30).",

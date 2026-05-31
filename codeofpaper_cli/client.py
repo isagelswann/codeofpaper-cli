@@ -10,7 +10,6 @@ Wraps httpx with:
 from __future__ import annotations
 
 import ssl
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -158,18 +157,18 @@ class Client:
                     f"(connect failed: {exc}). "
                     "Check your network/proxy or pass --api-url to override."
                 )
-            )
+            ) from exc
         except (httpx.ReadTimeout, httpx.WriteTimeout, httpx.PoolTimeout) as exc:
             raise ConnectionError_(
                 detail=(
                     f"Request to {self.base_url}{path} timed out after "
                     f"{self._timeout}. Increase --timeout or retry."
                 )
-            )
+            ) from exc
         except (httpx.TimeoutException, httpx.NetworkError) as exc:
-            raise ConnectionError_(detail=f"Cannot reach API at {self.base_url}: {exc}")
+            raise ConnectionError_(detail=f"Cannot reach API at {self.base_url}: {exc}") from exc
         except httpx.HTTPError as exc:
-            raise ConnectionError_(detail=f"HTTP error: {exc}")
+            raise ConnectionError_(detail=f"HTTP error: {exc}") from exc
 
         if response.status_code >= 400:
             detail = _extract_error_detail(response)
@@ -181,12 +180,12 @@ class Client:
 
         try:
             return response.json()
-        except Exception:
+        except Exception as exc:
             raise APIError(
                 status_code=response.status_code,
                 detail="Invalid JSON response from API",
                 exit_code=GENERAL_ERROR,
-            )
+            ) from exc
 
     # --- Convenience methods for specific endpoints ---
 

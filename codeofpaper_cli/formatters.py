@@ -19,8 +19,8 @@ from __future__ import annotations
 import csv
 import io
 import json
-import sys
-from typing import Any, Sequence
+from typing import Any
+from collections.abc import Sequence
 
 from rich.console import Console
 from rich.table import Table

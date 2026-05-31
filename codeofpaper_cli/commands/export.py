@@ -11,7 +11,6 @@ in a streaming-friendly format. Designed for piping:
 from __future__ import annotations
 
 import time
-from typing import Optional
 
 import typer
 
@@ -148,9 +147,9 @@ def _output(papers: list[dict], fmt: str) -> None:
 
 def export(
     source: str = typer.Argument(..., help="Source: trending, conference, or search."),
-    source_arg: Optional[str] = typer.Argument(None, help="Conference ID or search query."),
+    source_arg: str | None = typer.Argument(None, help="Conference ID or search query."),
     has_code: bool = typer.Option(False, "--has-code", help="Only include papers with code."),
-    category: Optional[str] = typer.Option(None, "--category", "-c", help="Filter by arXiv category."),
+    category: str | None = typer.Option(None, "--category", "-c", help="Filter by arXiv category."),
     days: int = typer.Option(30, "--days", "-d", help="Time window for trending (days)."),
     max_results: int = typer.Option(200, "--max", max=_MAX_EXPORT, help=f"Maximum total papers to export (max {_MAX_EXPORT})."),
 ) -> None:
@@ -171,6 +170,6 @@ def export(
         raise
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     _output(papers, fmt)

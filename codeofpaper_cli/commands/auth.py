@@ -1,6 +1,5 @@
 """Manage API key authentication."""
 
-from typing import Optional
 
 import typer
 
@@ -9,7 +8,7 @@ from codeofpaper_cli import config
 
 def auth(
     action: str = typer.Argument(..., help="Action: setup, status, or clear."),
-    key: Optional[str] = typer.Argument(None, help="API key (for setup action)."),
+    key: str | None = typer.Argument(None, help="API key (for setup action)."),
 ) -> None:
     """Manage API key authentication (setup, status, clear)."""
     action = action.lower()

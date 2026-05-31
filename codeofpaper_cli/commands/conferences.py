@@ -8,7 +8,6 @@ from codeofpaper_cli.formatters import (
     format_csv,
     format_json,
     format_jsonl,
-    format_quiet,
     print_error,
     print_table,
 )
@@ -23,7 +22,7 @@ def conferences() -> None:
             data = client.get_conferences()
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     # API returns a bare list
     items = data if isinstance(data, list) else []

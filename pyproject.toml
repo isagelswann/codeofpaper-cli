@@ -44,6 +44,9 @@ mcp = ["fastmcp>=2.0,<3.0"]
 [project.urls]
 Homepage = "https://codeofpaper.com"
 Documentation = "https://codeofpaper.com"
+Repository = "https://github.com/isagelswann/codeofpaper-cli"
+Issues = "https://github.com/isagelswann/codeofpaper-cli/issues"
+Changelog = "https://github.com/isagelswann/codeofpaper-cli/blob/master/CHANGELOG.md"
 
 [project.scripts]
 codeofpaper = "codeofpaper_cli.main:app"
@@ -59,3 +62,10 @@ testpaths = ["tests"]
 [tool.ruff]
 target-version = "py310"
 line-length = 100
+
+[tool.ruff.lint]
+# B008: typer's recommended pattern is `arg: T = typer.Option(...)` in defaults
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["PLR2004", "PLC0415"]

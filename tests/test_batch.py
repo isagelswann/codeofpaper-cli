@@ -13,7 +13,7 @@ import pytest
 from typer.testing import CliRunner
 
 from codeofpaper_cli.client import APIError, ConnectionError_
-from codeofpaper_cli.exit_codes import NOT_FOUND, RATE_LIMITED
+from codeofpaper_cli.exit_codes import NOT_FOUND
 from codeofpaper_cli.main import app
 from codeofpaper_cli.state import OutputFormat, state
 

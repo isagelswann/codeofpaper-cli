@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Optional
 
 
 class OutputFormat(str, Enum):
@@ -22,9 +21,9 @@ class State:
 
     output: OutputFormat = OutputFormat.table
     api_url: str = "https://api.codeofpaper.com"
-    api_key: Optional[str] = None
-    ca_bundle: Optional[str] = None
-    timeout: Optional[float] = None
+    api_key: str | None = None
+    ca_bundle: str | None = None
+    timeout: float | None = None
 
 
 state = State()

@@ -1,6 +1,5 @@
 """Browse papers from a specific conference."""
 
-from typing import Optional
 
 import typer
 
@@ -21,7 +20,7 @@ from codeofpaper_cli.state import state
 def conference(
     conference_id: str = typer.Argument(..., help="Conference ID (e.g. neurips_2024)."),
     has_code: bool = typer.Option(False, "--has-code", help="Only show papers with code."),
-    track: Optional[str] = typer.Option(None, "--track", help="Filter by track (e.g. oral, poster)."),
+    track: str | None = typer.Option(None, "--track", help="Filter by track (e.g. oral, poster)."),
     limit: int = typer.Option(20, "--limit", "-l", help="Maximum results to return."),
     offset: int = typer.Option(0, "--offset", help="Offset for pagination."),
 ) -> None:
@@ -38,7 +37,7 @@ def conference(
             )
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     papers = data.get("papers", [])
     title = data.get("name", conference_id)

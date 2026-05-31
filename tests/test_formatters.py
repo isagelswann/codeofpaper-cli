@@ -2,7 +2,6 @@
 
 import json
 
-import pytest
 
 from codeofpaper_cli.formatters import (
     _format_bibtex_author,
@@ -119,9 +118,9 @@ class TestFormatCsv:
     def test_custom_columns(self):
         items = [{"a": 1, "b": 2, "c": 3}]
         result = format_csv(items, columns=["a", "c"])
-        lines = [l.rstrip("\r") for l in result.strip().split("\n")]
-        assert "a,c" == lines[0]
-        assert "1,3" == lines[1]
+        lines = [ln.rstrip("\r") for ln in result.strip().split("\n")]
+        assert lines[0] == "a,c"
+        assert lines[1] == "1,3"
 
     def test_empty(self):
         assert format_csv([]) == ""

@@ -13,7 +13,6 @@ Fills gaps not covered by existing per-module tests:
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -31,7 +30,6 @@ from codeofpaper_cli.exit_codes import (
     exit_code_from_status,
 )
 from codeofpaper_cli.formatters import (
-    _format_bibtex_author,
     format_bibtex_entry,
     format_csv,
     format_json,

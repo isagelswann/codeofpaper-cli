@@ -380,7 +380,7 @@ No config file needed — everything works out of the box with sensible defaults
 Options are resolved in this order (first wins):
 
 1. CLI flag (`--api-url`, `--api-key`, `--ca-bundle`, `-o`)
-2. Environment variable (`CODEOFPAPER_API_URL`, `CODEOFPAPER_API_KEY`, `CODEOFPAPER_CA_BUNDLE`, `CODEOFPAPER_OUTPUT`)
+2. Environment variable (`CODEOFPAPER_API_URL`, `CODEOFPAPER_API_KEY`, `CODEOFPAPER_CA_BUNDLE`, `CODEOFPAPER_OUTPUT`, `CODEOFPAPER_TIMEOUT`)
 3. Config file
 4. Built-in defaults
 

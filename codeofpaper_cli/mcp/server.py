@@ -36,7 +36,7 @@ def build_app():  # pragma: no cover — exercised by smoke test, not unit tests
     """
     try:
         from fastmcp import FastMCP
-    except ImportError as exc:  # noqa: BLE001
+    except ImportError as exc:
         raise SystemExit(
             "codeofpaper-mcp requires the 'mcp' extra:\n"
             "    pip install 'codeofpaper[mcp]'\n"

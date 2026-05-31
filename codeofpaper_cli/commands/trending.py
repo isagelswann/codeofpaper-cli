@@ -1,6 +1,5 @@
 """Browse trending papers."""
 
-from typing import Optional
 
 import typer
 
@@ -23,7 +22,7 @@ def trending(
     has_code: bool = typer.Option(False, "--has-code", help="Only show papers with code."),
     limit: int = typer.Option(10, "--limit", "-l", help="Maximum results to return."),
     offset: int = typer.Option(0, "--offset", help="Offset for pagination."),
-    category: Optional[str] = typer.Option(None, "--category", "-c", help="Filter by arXiv category (e.g. cs.CV)."),
+    category: str | None = typer.Option(None, "--category", "-c", help="Filter by arXiv category (e.g. cs.CV)."),
     days: int = typer.Option(7, "--days", "-d", help="Trending window in days."),
 ) -> None:
     """Browse trending papers."""
@@ -36,7 +35,7 @@ def trending(
             )
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     # Use 'trending' array, NOT 'papers' (they're duplicated)
     papers = data.get("trending", [])

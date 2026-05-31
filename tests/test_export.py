@@ -7,7 +7,7 @@ output formats, --max limit, error handling, and edge cases.
 from __future__ import annotations
 
 import json
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from typer.testing import CliRunner
@@ -100,7 +100,7 @@ class TestExportTrending:
         lines = result.output.strip().split("\n")
         # Header + 3 data rows (+ "Exported" on stderr, not in output)
         assert lines[0].startswith("arxiv_id,")
-        assert len([l for l in lines if l.startswith("2024.")]) == 3
+        assert len([ln for ln in lines if ln.startswith("2024.")]) == 3
 
     @patch("codeofpaper_cli.commands.export.time.sleep")
     @patch("codeofpaper_cli.commands.export.Client")
@@ -111,7 +111,7 @@ class TestExportTrending:
         ).return_value
         result = runner.invoke(app, ["-o", "jsonl", "export", "trending"])
         assert result.exit_code == 0
-        lines = [l for l in result.output.strip().split("\n") if l.startswith("{")]
+        lines = [ln for ln in result.output.strip().split("\n") if ln.startswith("{")]
         assert len(lines) == 2
         parsed = json.loads(lines[0])
         assert "arxiv_id" in parsed
@@ -150,7 +150,7 @@ class TestExportTrending:
         ).return_value
         result = runner.invoke(app, ["-q", "export", "trending"])
         assert result.exit_code == 0
-        ids = [l for l in result.output.strip().split("\n") if l.startswith("2024.")]
+        ids = [ln for ln in result.output.strip().split("\n") if ln.startswith("2024.")]
         assert len(ids) == 3
 
     @patch("codeofpaper_cli.commands.export.time.sleep")
@@ -189,7 +189,7 @@ class TestExportConference:
         assert result.exit_code == 0
         lines = result.output.strip().split("\n")
         assert lines[0].startswith("arxiv_id,")
-        assert len([l for l in lines if l.startswith("2024.")]) == 5
+        assert len([ln for ln in lines if ln.startswith("2024.")]) == 5
 
     @patch("codeofpaper_cli.commands.export.time.sleep")
     @patch("codeofpaper_cli.commands.export.Client")
@@ -214,7 +214,7 @@ class TestExportSearch:
         ).return_value
         result = runner.invoke(app, ["-o", "jsonl", "export", "search", "transformers"])
         assert result.exit_code == 0
-        lines = [l for l in result.output.strip().split("\n") if l.startswith("{")]
+        lines = [ln for ln in result.output.strip().split("\n") if ln.startswith("{")]
         assert len(lines) == 4
 
     @patch("codeofpaper_cli.commands.export.time.sleep")

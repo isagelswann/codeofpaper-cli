@@ -16,7 +16,7 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import typer
 
@@ -69,7 +69,7 @@ def _emit(record: dict[str, Any]) -> None:
 
 def batch(
     command: str = typer.Argument(..., help="Command to batch: paper, search, code, similar, suggest."),
-    file: Optional[str] = typer.Argument(None, help="File with one query/ID per line (default: stdin)."),
+    file: str | None = typer.Argument(None, help="File with one query/ID per line (default: stdin)."),
     delay: float = typer.Option(0.5, "--delay", min=0.1, help="Delay between API calls in seconds (min 0.1)."),
 ) -> None:
     """Process multiple queries/IDs from stdin or a file.

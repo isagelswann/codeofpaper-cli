@@ -1,6 +1,5 @@
 """List categories or get category details."""
 
-from typing import Optional
 
 import typer
 from rich.table import Table
@@ -19,7 +18,7 @@ from codeofpaper_cli.state import state
 
 
 def categories(
-    category_id: Optional[str] = typer.Argument(None, help="Category ID for details (e.g. cv_classification)."),
+    category_id: str | None = typer.Argument(None, help="Category ID for details (e.g. cv_classification)."),
 ) -> None:
     """List all categories or get details for one."""
     fmt = state.output.value
@@ -31,7 +30,7 @@ def categories(
                 data = client.get_categories()
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     if category_id:
         _output_category_detail(data, fmt)

@@ -13,6 +13,7 @@ The functions are kept side-effect-free and easy to mock from
 
 from __future__ import annotations
 
+import contextlib
 import os
 from typing import Any
 
@@ -41,10 +42,8 @@ def _client() -> Client:
     c = Client(base_url=DEFAULT_API_URL)
     # Best-effort UA override; if httpx internals change, fall back to
     # whatever the underlying Client set so we still function.
-    try:
+    with contextlib.suppress(Exception):
         c._client.headers["User-Agent"] = MCP_USER_AGENT  # type: ignore[attr-defined]
-    except Exception:  # noqa: BLE001 — UA override is non-essential
-        pass
     return c
 
 
@@ -71,7 +70,7 @@ def paper_lookup(paper_id_or_url: str) -> dict[str, Any]:
     """
     try:
         arxiv_id = extract_arxiv_id(paper_id_or_url)
-    except Exception as exc:  # noqa: BLE001 — surfaces as MCP tool error
+    except Exception as exc:  # surfaces as MCP tool error
         return _error(f"Could not parse paper id from {paper_id_or_url!r}: {exc}")
 
     try:
@@ -129,7 +128,7 @@ def code_for_paper(
     """
     try:
         arxiv_id = extract_arxiv_id(paper_id_or_url)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         return _error(f"Could not parse paper id from {paper_id_or_url!r}: {exc}")
 
     safe_limit = max(1, min(int(limit), 25))

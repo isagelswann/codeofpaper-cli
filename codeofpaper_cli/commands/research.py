@@ -50,7 +50,7 @@ def research(
             result = _run_research(client, query, depth, limit)
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     _output_result(result, fmt)
 

@@ -28,7 +28,7 @@ def repo(
             data = client.search_papers(query=owner_repo, limit=10)
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     papers = data.get("papers", [])
 

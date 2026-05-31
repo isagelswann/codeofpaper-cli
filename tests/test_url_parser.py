@@ -1,6 +1,5 @@
 """Tests for URL parsing utilities."""
 
-import pytest
 
 from codeofpaper_cli.url_parser import (
     extract_arxiv_id,

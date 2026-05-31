@@ -17,7 +17,7 @@ def status() -> None:
             paper_health = client.get_paper_health()
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     services = health.get("services", {})
     combined = {**health, **paper_health}

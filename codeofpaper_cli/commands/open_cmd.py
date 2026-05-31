@@ -24,7 +24,7 @@ def open_paper(
                 data = client.get_paper_repos(arxiv_id, limit=1)
         except (APIError, ConnectionError_) as exc:
             print_error(str(exc), fmt)
-            raise typer.Exit(code=exc.exit_code)
+            raise typer.Exit(code=exc.exit_code) from None
 
         repos = data.get("top_repos", [])
         if not repos:

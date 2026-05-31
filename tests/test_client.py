@@ -1,6 +1,5 @@
 """Tests for the HTTP client."""
 
-import json
 import ssl
 
 import httpx
@@ -57,7 +56,7 @@ class TestClient:
         transport = httpx.MockTransport(handler)
         client = Client.__new__(Client)
         client.base_url = kwargs.get("base_url", "https://api.codeofpaper.com")
-        client.api_key = kwargs.get("api_key", None)
+        client.api_key = kwargs.get("api_key")
         client._timeout = httpx.Timeout(30.0, connect=10.0)
         client._client = httpx.Client(
             base_url=client.base_url,

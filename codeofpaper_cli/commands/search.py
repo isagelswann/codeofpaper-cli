@@ -1,6 +1,5 @@
 """Search papers by text query."""
 
-from typing import Optional
 
 import typer
 
@@ -26,16 +25,16 @@ def search(
         "relevant", "--sort", "-s", help="Sort by: relevant, recent, has_code, trending."
     ),
     has_code: bool = typer.Option(False, "--has-code", help="Only show papers with code."),
-    year: Optional[int] = typer.Option(
+    year: int | None = typer.Option(
         None, "--year", help="Restrict to a single publication year."
     ),
-    after: Optional[str] = typer.Option(
+    after: str | None = typer.Option(
         None, "--after", help="Only papers published on/after YYYY-MM-DD (or YYYY)."
     ),
-    before: Optional[str] = typer.Option(
+    before: str | None = typer.Option(
         None, "--before", help="Only papers published on/before YYYY-MM-DD (or YYYY)."
     ),
-    venue: Optional[str] = typer.Option(
+    venue: str | None = typer.Option(
         None,
         "--venue",
         help="Conference series ('neurips'), id ('neurips2024'), or name substring.",
@@ -44,7 +43,7 @@ def search(
     """Search papers by text query."""
     fmt = state.output.value
 
-    def _norm_date(value: Optional[str], end_of_year: bool) -> Optional[str]:
+    def _norm_date(value: str | None, end_of_year: bool) -> str | None:
         if not value:
             return None
         v = value.strip()
@@ -69,7 +68,7 @@ def search(
             )
     except (APIError, ConnectionError_) as exc:
         print_error(str(exc), fmt)
-        raise typer.Exit(code=exc.exit_code)
+        raise typer.Exit(code=exc.exit_code) from None
 
     papers = data.get("papers", [])
 
