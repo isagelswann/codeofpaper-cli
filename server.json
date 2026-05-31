@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.isagelswann/codeofpaper",
+  "title": "Code of Paper",
+  "description": "Find GitHub implementations of arXiv research papers — paper lookup, ranked code, search.",
+  "repository": {
+    "url": "https://github.com/isagelswann/codeofpaper-cli",
+    "source": "github"
+  },
+  "websiteUrl": "https://codeofpaper.com",
+  "version": "0.3.2",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "codeofpaper",
+      "version": "0.3.2",
+      "runtimeHint": "uvx",
+      "runtimeArguments": [
+        {"type": "named", "name": "--from", "value": "codeofpaper[mcp]"},
+        {"type": "positional", "valueHint": "command", "value": "codeofpaper-mcp"}
+      ],
+      "transport": {"type": "stdio"},
+      "environmentVariables": [
+        {"name": "CODEOFPAPER_API_URL", "description": "Override the API base URL (default https://api.codeofpaper.com).", "isRequired": false, "format": "string"}
+      ]
+    }
+  ]
+}
