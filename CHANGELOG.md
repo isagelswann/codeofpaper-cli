@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.3.1 — 2026-05-31
+
+Repository hygiene + public-launch prep. No CLI or MCP surface changes.
+
+### Added
+
+- `LICENSE` file (MIT) shipped in sdist + wheel (pyproject already declared MIT, but the file was missing on disk).
+- `[project.urls]` entries for Repository, Issues, Changelog — surfaced in the PyPI sidebar.
+- GitHub Actions CI: `pytest` + `ruff` matrix on Python 3.10-3.13.
+- README documents the `CODEOFPAPER_TIMEOUT` env var (previously undocumented).
+
+### Fixed
+
+- CLI error output no longer shows the spurious *"During handling of the above exception, another exception occurred"* tail — all `typer.Exit` and re-raised API errors now use `raise ... from None` / `from exc` (21 sites).
+
+### Internal
+
+- Ruff lint config under `[tool.ruff.lint]`; `B008` ignored project-wide (Typer's recommended `arg = typer.Option(...)` pattern); per-file `PLR2004` / `PLC0415` ignored for tests.
+- `contextlib.suppress(Exception)` for the MCP User-Agent override (was `try/except/pass`).
+- Modernised type annotations: `Optional[X]` → `X | None`, `typing.Sequence` → `collections.abc.Sequence`.
+- Removed unused imports across the package and test suite.
+- All 339 tests pass; ruff is clean.
+
 ## 0.3.0 — 2026-05-22
 
 Optional MCP (Model Context Protocol) server. Exposes paper / code lookup
