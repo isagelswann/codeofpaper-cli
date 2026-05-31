@@ -236,19 +236,20 @@ This adds a `codeofpaper-mcp` entry point that speaks MCP over stdio.
 
 ### Wire into Claude Desktop
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%APPDATA%\Claude\claude_desktop_config.json` (Windows), or `~/.config/Claude/claude_desktop_config.json` (Linux):
 
 ```json
 {
   "mcpServers": {
     "codeofpaper": {
-      "command": "codeofpaper-mcp"
+      "command": "uvx",
+      "args": ["--from", "codeofpaper[mcp]", "codeofpaper-mcp"]
     }
   }
 }
 ```
 
-If you installed via `uv tool install`, use `uvx codeofpaper-mcp` instead.
+This pulls + runs the server on demand — no global install needed. If you've already `pip install`'d the package, you can replace the command with just `"codeofpaper-mcp"` and drop `args`.
 
 ### Wire into Cursor / Continue / Cline
 
